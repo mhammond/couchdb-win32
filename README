@@ -259,4 +259,73 @@ If you want the Apache CouchDB daemon to run at startup, copy the
 Windows
 ~~~~~~~
 
-Windows documentation is incomplete. Please submit suggestions.
+Windows documentation is incomplete.  Please submit suggestions.
+
+To build on Windows, you need the following tools:
+
+* cygwin - it isn't clear exactly which tools you need - select all 
+  'development' tools.
+
+* VS2008
+
+* Erlang - a binary distro of erlang is OK.
+
+Other tools:
+
+* Fetch the 'curl' sources and build them as per the instructions.  The cygwin
+  curl binaries are built with a different compiler so are no good.
+
+* Download the ICU binaries built with VS2008.
+
+* Download and build the hg trunk of seamonkey.
+
+Setup your environment:
+
+Start a cygwin shell  (NOTE: If you are using Vista, you need to start an 
+elevated shell script, otherwise cygwin will fail attempting to 
+'chmod +x filename'.)
+
+Set the following variables:
+
+  * COUCHDB_TOP to the source directory.
+  * ERL_TOP to the top of the erlang directory (if you built erlang from
+    sources, that variable is probably already set)
+
+Add a couple of directories to the PATH:
+
+  $ export PATH=$PATH:$COUCHDB_TOP/utils/win32/vc:$ERL_TOP/erts-5.6.5/bin
+
+Then set more variables:
+
+  $ export CC=cc.sh
+  $ export LD=ld.sh
+  $ export AR=ar.sh
+  $ export RC=rc.sh
+
+And we should be ready to bootstrap:
+
+  $ cd $COUCHDB_TOP
+  $ cd $COUCHDB_TOP
+  $ ./bootstrap
+  You have bootstrapped Apache CouchDB, time to relax.
+
+  Run `./configure' to configure the source before you install.
+  $
+
+Now we need to run a complicated configure command-line.  This is
+all one command and should be entered without the comments:
+
+  $ ./configure \
+      --with-js-include=path_to_seamonkey_include \
+      --with-js-lib=path_to_seamonkey_lib \
+      --with-win32-icu-binaries=path/to/icu-binaries/include \
+      --with-erlang=path/to/erlang/erts-5.6.5/include \
+      --with-win32-curl=path/to/curl/root/directory
+
+Where:
+* 'path_to_seamonkey_include' will be the 'build-xxx/dist/include' dir under seamonkey.
+* 'path_to_seamonkey_lib' is the 'build-xxx/dist/lib
+* The other paths should be somewhat obvious.
+
+
+
