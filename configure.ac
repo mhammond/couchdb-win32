@@ -80,34 +80,59 @@ AC_ARG_VAR([FLAGS], [general flags to prepend to LDFLAGS and CPPFLAGS])
 LIB_FLAGS="$JS_LIB_FLAGS -L/usr/local/lib -L/opt/local/lib"
 LIBS="$LIB_FLAGS $LIBS"
 # XP_UNIX required for jsapi.h and has been tested to work on Linux and Darwin.
-FLAGS="$LIB_FLAGS $ERLANG_FLAGS $JS_FLAGS -DXP_UNIX $FLAGS"
-CPPFLAGS="$FLAGS $CPPFLAGS"
+#FLAGS="$LIB_FLAGS $ERLANG_FLAGS $JS_FLAGS -DXP_UNIX $FLAGS"
+#CPPFLAGS="$FLAGS $CPPFLAGS"
 # manually linking libm is requred for FreeBSD 7.0
-LDFLAGS="$FLAGS -lm $LDFLAGS"
+#LDFLAGS="$FLAGS -lm $LDFLAGS"
+
+# But not good enuf for windows :(
+# XXX - TODO - Add a 'uname' check - XXX
+FLAGS="$LIB_FLAGS $ERLANG_FLAGS $JS_FLAGS -DXP_WIN $FLAGS"
+CPPFLAGS="$FLAGS $CPPFLAGS"
+LDFLAGS="$FLAGS $LDFLAGS"
 
 AC_CHECK_LIB([js], [JS_NewContext], [], [
     AC_CHECK_LIB([mozjs], [JS_NewContext], [], [
-        AC_MSG_ERROR([Could not find the js library.
+        AC_CHECK_LIB([js3250], [JS_NewContext], [], [
+            AC_MSG_ERROR([Could not find the js library.
 
-Is the Mozilla SpiderMonkey library installed?])])])
+Is the Mozilla SpiderMonkey library installed?])])])])
 
 AC_CHECK_HEADER([jsapi.h], [], [
     AC_MSG_ERROR([Could not find the jsapi header.
 
 Are the Mozilla SpiderMonkey headers installed?])])
 
-AC_CHECK_ICU([3])
+AC_ARG_WITH([win32-icu-binaries], [AC_HELP_STRING([--with-win32-icu-binaries=PATH],
+    [set PATH to the Win32 native ICU binaries directory])], [
+    ICU_CONFIG="what is this??? ICU_CONFIG??"
+    ICU_LOCAL_CFLAGS="-I$withval/include"
+    ICU_LOCAL_LDFLAGS="-L$withval/lib"
+], [
+    AC_CHECK_ICU([3])
 
-ICU_LOCAL_CFLAGS=`$ICU_CONFIG --cppflags-searchpath`
-ICU_LOCAL_LDFLAGS=`$ICU_CONFIG --ldflags-searchpath`
+    ICU_LOCAL_CFLAGS=`$ICU_CONFIG --cppflags-searchpath`
+    ICU_LOCAL_LDFLAGS=`$ICU_CONFIG --ldflags-searchpath`
+])
+
 
 AC_SUBST(ICU_CONFIG)
 AC_SUBST(ICU_LOCAL_CFLAGS)
 AC_SUBST(ICU_LOCAL_LDFLAGS)
 
-AC_CHECK_CURL([7.15.5])
+AC_ARG_WITH([win32-curl], [AC_HELP_STRING([--with-win32-curl=PATH],
+    [set PATH to the Win32 native curl directory])], [
+    # default build on windows is a static lib, and that's what we want too
+    CURL_CFLAGS="-I$withval/include -DCURL_STATICLIB"
+    CURL_LIBS="$withval/lib/libcurl"
+    CURL_LDFLAGS="-l$CURL_LIBS -lWs2_32 -lkernel32 -luser32 -ladvapi32 -lWldap32"
+], [
+    AC_CHECK_CURL([7.15.5])
+])
+
 AC_SUBST(CURL_CFLAGS)
 AC_SUBST(CURL_LIBS)
+AC_SUBST(CURL_LDFLAGS)
 
 case "$(uname -s)" in
   Linux)
