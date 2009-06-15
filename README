@@ -281,9 +281,14 @@ Other tools:
 
 Setup your environment:
 
-Start a cygwin shell  (NOTE: If you are using Vista, you need to start an 
-elevated shell script, otherwise cygwin will fail attempting to 
+Execute the VC .bat files to setup your environment such that cl.exe etc are
+on your path.  Start a cygwin shell  (NOTE: If you are using Vista, you need 
+to start an  elevated shell script, otherwise cygwin will fail attempting to 
 'chmod +x filename'.)
+
+Check your environment:
+  * which link -> should point at the MS linker.
+  * which cl -> should point at the MS compiler.
 
 Set the following variables:
 
@@ -312,8 +317,7 @@ And we should be ready to bootstrap:
   Run `./configure' to configure the source before you install.
   $
 
-Now we need to run a complicated configure command-line.  This is
-all one command and should be entered without the comments:
+Now we need to run a complicated configure command-line.
 
   $ ./configure \
       --with-js-include=path_to_seamonkey_include \
@@ -323,9 +327,27 @@ all one command and should be entered without the comments:
       --with-win32-curl=path/to/curl/root/directory
 
 Where:
-* 'path_to_seamonkey_include' will be the 'build-xxx/dist/include' dir under seamonkey.
-* 'path_to_seamonkey_lib' is the 'build-xxx/dist/lib
-* The other paths should be somewhat obvious.
+* 'path_to_seamonkey_include' will be the 'build-xxx/dist/include' dir under 
+   seamonkey in cygwin format (ie, /cygpath/...)
+* 'path_to_seamonkey_lib' is the 'build-xxx/dist/lib in cygwin format.
+* 'path/to/icu-binaries' should be in cygwin format.
+* The other paths should be somewhat obvious, but are in Windows format
+  with forward slashes (eg, c:/...).
 
+For reference, the following command-line is an example of a real command-line:
 
+./configure --with-js-include=/cygdrive/o/src/mozilla-central/work/js/src/build-release/dist/include \
+            --with-js-lib=/cygdrive/o/src/mozilla-central/work/js/src/build-release/dist/lib \
+            --with-win32-icu-binaries=o:/src/mm/icu \
+            --with-erlang=o:/temp/erl5.6.5/erts-5.6.5/include \
+            --with-win32-curl=o:/src/mm/curl-7.19.5
 
+Status:
+
+* Most things currently build - notable exception is 'couch_erl_driver.dll'.
+  Problems seem to be:
+
+  - making libtool do the right thing wrt command-lines.
+
+  - ICU lib names seem to be a 'short' version on win32 - eg,
+    licuin.lib instead of licui18n.lib, etc.
