@@ -31,6 +31,11 @@ couchjs_LDFLAGS = $(CURL_LDFLAGS)
 couchjs_CFLAGS = $(CURL_CFLAGS)
 couchjs_LDADD = $(CURL_LDFLAGS)
 
+if WINDOWS
+priv_couchspawnkillable_SOURCES = priv/couchspawnkillable_win.c
+couchpriv_PROGRAMS = priv/couchspawnkillable
+endif
+
 couchinclude_DATA = couch_db.hrl
 
 couchebin_DATA = $(compiled_files)
