@@ -79,17 +79,24 @@ AC_ARG_VAR([FLAGS], [general flags to prepend to LDFLAGS and CPPFLAGS])
 
 LIB_FLAGS="$JS_LIB_FLAGS -L/usr/local/lib -L/opt/local/lib"
 LIBS="$LIB_FLAGS $LIBS"
-# XP_UNIX required for jsapi.h and has been tested to work on Linux and Darwin.
-#FLAGS="$LIB_FLAGS $ERLANG_FLAGS $JS_FLAGS -DXP_UNIX $FLAGS"
-#CPPFLAGS="$FLAGS $CPPFLAGS"
-# manually linking libm is requred for FreeBSD 7.0
-#LDFLAGS="$FLAGS -lm $LDFLAGS"
 
-# But not good enuf for windows :(
-# XXX - TODO - Add a 'uname' check - XXX
-FLAGS="$LIB_FLAGS $ERLANG_FLAGS $JS_FLAGS -DXP_WIN $FLAGS"
-CPPFLAGS="$FLAGS $CPPFLAGS"
-LDFLAGS="$FLAGS $LDFLAGS"
+case "$(uname -s)" in
+  CYGWIN*)
+    FLAGS="$LIB_FLAGS $ERLANG_FLAGS $JS_FLAGS -DXP_WIN $FLAGS"
+    CPPFLAGS="$FLAGS $CPPFLAGS"
+    LDFLAGS="$FLAGS $LDFLAGS"
+    IS_WINDOWS="SADLY"
+    ;;
+  *)
+    # XP_UNIX required for jsapi.h and has been tested to work on Linux and Darwin.
+    FLAGS="$LIB_FLAGS $ERLANG_FLAGS $JS_FLAGS -DXP_UNIX $FLAGS"
+    CPPFLAGS="$FLAGS $CPPFLAGS"
+    # manually linking libm is requred for FreeBSD 7.0
+    LDFLAGS="$FLAGS -lm $LDFLAGS"
+    ;;
+esac
+
+AM_CONDITIONAL([WINDOWS], [test x$IS_WINDOWS = xSADLY])
 
 AC_CHECK_LIB([js], [JS_NewContext], [], [
     AC_CHECK_LIB([mozjs], [JS_NewContext], [], [
