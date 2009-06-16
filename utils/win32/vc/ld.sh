@@ -40,6 +40,11 @@ while test -n "$1" ; do
 	    y=`echo $x | sed 's,^-L\(.*\),\1,g'`;
 	    MPATH=`cygpath -m $y`;
 	    CMD="$CMD -libpath:\"$MPATH\"";; 
+	-link)
+        # libtool tries to be helpful by passing -link.
+        # theoretically that should be via cc.sh, but this
+        # is all a mystery still...
+        ;;
 	-lMSVCRT|-lmsvcrt)
 	    STDLIB_FORCED=true;
 	    STDLIB=MSVCRT.LIB;; 

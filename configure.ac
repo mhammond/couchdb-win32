@@ -29,6 +29,7 @@ AC_DISABLE_STATIC
 
 AC_PROG_CC
 AC_PROG_LIBTOOL
+
 AC_PROG_LN_S
 
 AC_MSG_CHECKING([for pthread_create in -lpthread])
@@ -112,7 +113,7 @@ Are the Mozilla SpiderMonkey headers installed?])])
 
 AC_ARG_WITH([win32-icu-binaries], [AC_HELP_STRING([--with-win32-icu-binaries=PATH],
     [set PATH to the Win32 native ICU binaries directory])], [
-    ICU_CONFIG="what is this??? ICU_CONFIG??"
+    ICU_CONFIG="" # supposed to be a command to query options...
     ICU_LOCAL_CFLAGS="-I$withval/include"
     ICU_LOCAL_LDFLAGS="-L$withval/lib"
 ], [
@@ -308,6 +309,16 @@ AC_CONFIG_FILES([utils/Makefile])
 AC_CONFIG_FILES([var/Makefile])
 
 AC_OUTPUT
+
+# *sob* - on Windows libtool fails as 'libname_spec' isn't correct (it
+# expects GNU style lib names).  I can't work out how to configure this
+# option sanely, so we pass the script through sed to modify it.
+# PLEASE, someone help put this out of its misery!!
+if test x${IS_WINDOWS} = xSADLY; then
+    sed 's,libname_spec="lib\\$name",libname_spec="\\\$name",' < libtool > libtool.tmp
+    mv libtool.tmp libtool
+    # probably would chmod +x if we weren't on windows...
+fi
 
 echo
 echo "You have configured Apache CouchDB, time to relax."

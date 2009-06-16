@@ -34,6 +34,8 @@ couchjs_LDADD = $(CURL_LDFLAGS)
 if WINDOWS
 priv_couchspawnkillable_SOURCES = priv/couchspawnkillable_win.c
 couchpriv_PROGRAMS = priv/couchspawnkillable
+couch_erl_driver_la_LIBADD = -licuuc -licudt -licuin
+couch_erl_driver_la_LDFLAGS += -no-undefined
 endif
 
 couchinclude_DATA = couch_db.hrl
