@@ -270,6 +270,8 @@ To build on Windows, you need the following tools:
 
 * Erlang - a binary distro of erlang is OK.
 
+* Windows SDK
+
 Other tools:
 
 * Fetch the 'curl' sources and build them as per the instructions.  The cygwin
@@ -295,10 +297,11 @@ Set the following variables:
   * COUCHDB_TOP to the source directory.
   * ERL_TOP to the top of the erlang directory (if you built erlang from
     sources, that variable is probably already set)
+	* WIN_SDK_TOP to the windows SDK directory
 
 Add a couple of directories to the PATH:
 
-  $ export PATH=$PATH:$COUCHDB_TOP/utils/win32/vc:$ERL_TOP/erts-5.6.5/bin
+  $ export PATH=$PATH:$COUCHDB_TOP/utils/win32/vc:$ERL_TOP/erts-5.6.5/bin:$WIN_SDK_TOP/bin
 
 Then set more variables:
 
@@ -309,7 +312,6 @@ Then set more variables:
 
 And we should be ready to bootstrap:
 
-  $ cd $COUCHDB_TOP
   $ cd $COUCHDB_TOP
   $ ./bootstrap
   You have bootstrapped Apache CouchDB, time to relax.
