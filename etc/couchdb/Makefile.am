@@ -45,16 +45,16 @@ default_dev.ini: default.ini.tpl
 	< $< > $@
 
 install-data-hook:
-	if test ! -f "$(DESTDIR)/$(localconfdir)/local.ini"; then \
-	    cp $(srcdir)/local.ini "$(DESTDIR)/$(localconfdir)/local.ini"; \
+	if test ! -f "$(DESTDIR)$(localconfdir)/local.ini"; then \
+	    cp $(srcdir)/local.ini "$(DESTDIR)$(localconfdir)/local.ini"; \
 	fi
 	if test ! "$(mkdir_p)" = ""; then \
-	    $(mkdir_p) "$(DESTDIR)/$(localconfdir)/default.d"; \
-	    $(mkdir_p) "$(DESTDIR)/$(localconfdir)/local.d"; \
+	    $(mkdir_p) "$(DESTDIR)$(localconfdir)/default.d"; \
+	    $(mkdir_p) "$(DESTDIR)$(localconfdir)/local.d"; \
 	else \
 	    echo "WARNING: You may have to create these directories by hand."; \
-	    mkdir -p "$(DESTDIR)/$(localconfdir)/default.d"; \
-	    mkdir -p "$(DESTDIR)/$(localconfdir)/local.d"; \
+	    mkdir -p "$(DESTDIR)$(localconfdir)/default.d"; \
+	    mkdir -p "$(DESTDIR)$(localconfdir)/local.d"; \
 	fi
 
 uninstall-local:
