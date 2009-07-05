@@ -1,0 +1,154 @@
+Apache CouchDB README for Windows
+=================================
+
+
+The Windows build process is very similar to the erlang build process;
+indeed, we re-use some of their shell-scripts.  Therefore, it is recommended
+you build erlang itself from sources - this will ensure that you have all the
+tools and environment necessary to build couch itself.  A binary build of
+erlang should work for those in a hurry (see below), but it isn't really
+supported.  See the end of this doc for notes on building erlang which are
+relevant to couch.
+
+Build Tools
+-----------
+
+To build on Windows, you need the following tools:
+
+* cygwin - it isn't clear exactly which tools you need - select all 
+  'development' tools.  As mentioned above, if you can build erlang itself
+  you have everything you need.
+
+* VS2008
+
+* Erlang - a built source distro of erlang is preferred.  A binary
+  distribution of Erlang is OK, but you will also need a source distribution
+  for the cc.sh/link.sh etc wrapper shell scripts used by erlang - couch
+  reuses these scripts in its build process and the license isn't compatible
+  enough for us to clone them.
+
+* Windows SDK
+
+Other tools:
+
+* Fetch the 'curl' sources and build them as per the instructions.  The cygwin
+  curl binaries are built with a different compiler so are no good.
+
+* Download the ICU binaries built with VS2008.
+
+* Download and build the hg trunk/branch of seamonkey.
+
+Build Environment
+-----------------
+
+Setup your environment:
+
+For the sake of everything you find sacred:
+  set CYGWIN=nontsec
+BEFORE starting any cygwin environments.  Set this variable globally.  Without
+it you can expect all kinds of permissions-related problems.
+
+Execute the VC .bat files to setup your environment such that cl.exe etc are
+on your path.  Start a cygwin shell.
+
+Check your environment:
+  * which link -> should point at the MS linker.
+  * which cl -> should point at the MS compiler.
+
+Set the following variables:
+
+  * COUCHDB_TOP to the source directory.
+  * ERL_TOP to the top of the erlang directory (if you built erlang from
+    sources, that variable is probably already set)
+  * WIN_SDK_TOP to the windows SDK directory (XXX - true??)
+
+Add a couple of directories to the PATH:
+
+  $ export PATH=$PATH:$ERL_TOP/erts-5.6.5/bin:$WIN_SDK_TOP/bin
+
+If you are building with a binary distro of Erlang:
+
+  You must also ensure the cc.sh etc scripts from the Erlang source tree is
+  on your PATH.  Use "which cc.sh" to ensure the path is set correctly.
+
+  Then set more variables:
+    $ export CC=cc.sh
+    $ export LD=ld.sh
+    $ export AR=ar.sh
+    $ export RC=rc.sh
+
+If you are building Erlang from sources, then executing 
+"eval `./otp_build env_win32`" as per the Erlang build instructions,
+will have set everything up, including the CC, LD etc variables.
+EXCEPT - PATH must be adjusted such what 'which erl' lists the erl.exe
+you built rather than the 'erl' script in the cygwin_tools directory.
+
+You must also set a CFLAGS environment variable to '-O2' - ie:
+
+  # export CFLAGS=-O2
+
+And we should be ready to bootstrap and build
+
+Building
+--------
+
+We start by bootstrapping:
+
+  $ cd $COUCHDB_TOP
+  $ ./bootstrap
+  You have bootstrapped Apache CouchDB, time to relax.
+
+  Run `./configure' to configure the source before you install.
+  $
+
+Now we need to run a complicated configure command-line.
+
+  $ ./configure \
+      --with-js-include=path_to_seamonkey_include \
+      --with-js-lib=path_to_seamonkey_lib \
+      --with-win32-icu-binaries=path/to/icu-binaries/include \
+      --with-erlang=path/to/erlang/erts-5.6.5/include \
+      --with-win32-curl=path/to/curl/root/directory
+      --prefix=/cygdrive/path/to/erlang/releasec
+
+Where:
+* 'path_to_seamonkey_include' will be the 'build-xxx/dist/include' dir under 
+   seamonkey in cygwin format (ie, /cygpath/...)
+* 'path_to_seamonkey_lib' is the 'build-xxx/dist/lib in cygwin format.
+* 'path/to/icu-binaries' should be in cygwin format.
+* The other paths should be somewhat obvious, but are in Windows format
+  with forward slashes (eg, c:/...).
+* The --with-erlang option will need to point at a 'build' directory in
+  the erlang tree if you built erlang from source (eg, 
+  c:/path/to/erlang-src/release/win32/usr/include'
+* --prefix points to the directory where the erlang binaries live.  If you
+  build erlang from sources, this should be $ERL_TOP/release/win32
+
+For reference, the following command-line is an example of a real command-line:
+
+./configure --with-js-include=/cygdrive/o/src/mozilla-central/work/js/src/build-release/dist/include \
+            --with-js-lib=/cygdrive/o/src/mozilla-central/work/js/src/build-release/dist/lib \
+            --with-win32-icu-binaries=/cygdrive/o/src/mm/icu \
+            --with-erlang=o:/temp/erl5.6.5/erts-5.6.5/include \
+            --with-win32-curl=o:/src/mm/curl-7.19.5 \
+            --prefix=/cygdrive/c/src/mm/couch/otp_src_R13B01/release/win32/
+
+Note: --prefix above - only used by 'make install' and assumes a source
+erlang distro.  couch will be installed directly into the specified dir.
+
+Additional Notes:
+
+Building erlang: 
+* Follow the instructions as described.  You do need openssl, but don't need
+  the GUI tools.  You may like to execute:
+
+    echo "skipping gs" > lib/gs/SKIP
+    echo "skipping ic" > lib/ic/SKIP
+
+  To skip them.
+
+* Ensure 'which link' points at the ms linker; one in /usr/bin may be found 
+  instead.
+
+* After executing './otp_build release -a', be sure to execute Install.exe in
+  the release/win32 directory to setup the release/win32/bin dir correctly.
