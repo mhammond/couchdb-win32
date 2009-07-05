@@ -116,17 +116,20 @@ AC_ARG_WITH([win32-icu-binaries], [AC_HELP_STRING([--with-win32-icu-binaries=PAT
     ICU_CONFIG="" # supposed to be a command to query options...
     ICU_LOCAL_CFLAGS="-I$withval/include"
     ICU_LOCAL_LDFLAGS="-L$withval/lib"
+    ICU_LOCAL_BIN=$withval/bin
 ], [
     AC_CHECK_ICU([3])
 
     ICU_LOCAL_CFLAGS=`$ICU_CONFIG --cppflags-searchpath`
     ICU_LOCAL_LDFLAGS=`$ICU_CONFIG --ldflags-searchpath`
+    ICU_LOCAL_BIN=
 ])
 
 
 AC_SUBST(ICU_CONFIG)
 AC_SUBST(ICU_LOCAL_CFLAGS)
 AC_SUBST(ICU_LOCAL_LDFLAGS)
+AC_SUBST(ICU_LOCAL_BIN)
 
 AC_ARG_WITH([win32-curl], [AC_HELP_STRING([--with-win32-curl=PATH],
     [set PATH to the Win32 native curl directory])], [
@@ -275,13 +278,14 @@ AC_SUBST([locallibdir], [${libdir}/${package_identifier}])
 AC_SUBST([localstatelibdir], [${localstatedir}/lib/${package_identifier}])
 AC_SUBST([localstatelogdir], [${localstatedir}/log/${package_identifier}])
 AC_SUBST([localstaterundir], [${localstatedir}/run/${package_identifier}])
-AC_SUBST([locallibbindir], [${locallibdir}/bin])
 
 # On Windows we install directly into our erlang distribution.
 if test x${IS_WINDOWS} = xSADLY; then
+    AC_SUBST([locallibbindir], [${prefix}/bin])
     AC_SUBST([localerlangbindir], [${libdir}])
     AC_SUBST([localerlanglibdir], [${libdir}])
 else
+    AC_SUBST([locallibbindir], [${locallibdir}/bin])
     AC_SUBST([localerlangbindir], [${locallibdir}/erlang/bin])
     AC_SUBST([localerlanglibdir], [${locallibdir}/erlang/lib])
 fi
@@ -321,9 +325,13 @@ AC_OUTPUT
 # *sob* - on Windows libtool fails as 'libname_spec' isn't correct (it
 # expects GNU style lib names).  I can't work out how to configure this
 # option sanely, so we pass the script through sed to modify it.
+# Also, the erlang cc.sh script doesn't cope well with the '-link' command
+# line libtool provides.
 # PLEASE, someone help put this out of its misery!!
 if test x${IS_WINDOWS} = xSADLY; then
-    sed 's,libname_spec="lib\\$name",libname_spec="\\\$name",' < libtool > libtool.tmp
+    sed -e 's,libname_spec="lib\\$name",libname_spec="\\\$name",' \
+        -e 's,-link,,' \
+        < libtool > libtool.tmp
     mv libtool.tmp libtool
     # probably would chmod +x if we weren't on windows...
 fi

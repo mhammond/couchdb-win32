@@ -40,6 +40,10 @@ if WINDOWS
 priv_couchspawnkillable_SOURCES = priv/couchspawnkillable_win.c
 couchpriv_PROGRAMS = priv/couchspawnkillable
 couch_erl_driver_la_LDFLAGS += -no-undefined
+
+# copy ICU dlls for the erlang driver
+dist_couch_erl_driver_la_DATA=$(ICU_LOCAL_BIN)/icuuc42.dll $(ICU_LOCAL_BIN)/icudt42.dll $(ICU_LOCAL_BIN)/icuin42.dll
+couch_erl_driver_ladir=$(bindir)
 endif
 
 couchinclude_DATA = couch_db.hrl
