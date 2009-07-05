@@ -11,6 +11,11 @@
 ## the License.
 
 ICU_LOCAL_FLAGS = $(ICU_LOCAL_CFLAGS) $(ICU_LOCAL_LDFLAGS)
+if WINDOWS
+ICU_LOCAL_LIBS=-licuuc -licudt -licuin
+else
+ICU_LOCAL_LIBS=-licuuc -licudata -licui18n
+endif
 
 # devdocdir = $(localdocdir)/developer/couchdb
 couchlibdir = $(localerlanglibdir)/couch-$(version)
@@ -23,7 +28,7 @@ couchprivlib_LTLIBRARIES = couch_erl_driver.la
 couch_erl_driver_la_SOURCES = couch_erl_driver.c
 couch_erl_driver_la_LDFLAGS = -module -avoid-version $(ICU_LOCAL_FLAGS)
 couch_erl_driver_la_CFLAGS = $(ICU_LOCAL_FLAGS)
-couch_erl_driver_la_LIBADD = -licuuc -licudata -licui18n
+couch_erl_driver_la_LIBADD = $(ICU_LOCAL_LIBS)
 
 locallibbin_PROGRAMS = couchjs
 couchjs_SOURCES = couch_js.c curlhelper.c curlhelper.h
@@ -34,7 +39,6 @@ couchjs_LDADD = $(CURL_LDFLAGS)
 if WINDOWS
 priv_couchspawnkillable_SOURCES = priv/couchspawnkillable_win.c
 couchpriv_PROGRAMS = priv/couchspawnkillable
-couch_erl_driver_la_LIBADD = -licuuc -licudt -licuin
 couch_erl_driver_la_LDFLAGS += -no-undefined
 endif
 
