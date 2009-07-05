@@ -1,16 +1,16 @@
 @echo off
 setlocal
-rem First put the erlang dir on the PATH.
-set PATH=%~dp0;%PATH%
+rem First change to the erlang bin directory
+cd %~dp0
 
 rem Allow a different erlang executable (eg, werl) to be used.
 if "%ERL%x" == "x" set ERL=erl.exe
 
 echo CouchDB %version% - prepare to relax...
-erl -smp auto -sasl errlog_type error ^
-        -eval "application:load(ibrowse)" ^
-        -eval "application:load(crypto)" ^
-        -eval "application:load(couch)" ^
-        -eval "crypto:start()" ^
-        -eval "ibrowse:start()" ^
-        -eval "couch_server:start(), receive done -> done end."
+%ERL% -smp auto -sasl errlog_type error ^
+      -eval "application:load(ibrowse)" ^
+      -eval "application:load(crypto)" ^
+      -eval "application:load(couch)" ^
+      -eval "crypto:start()" ^
+      -eval "ibrowse:start()" ^
+      -eval "couch_server:start([""../etc/couchdb/default.ini"", ""../etc/couchdb/local.ini""]), receive done -> done end."
