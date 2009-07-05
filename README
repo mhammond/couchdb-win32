@@ -324,6 +324,10 @@ will have set everything up, including the CC, LD etc variables.
 EXCEPT - PATH must be adjusted such what 'which erl' lists the erl.exe
 you built rather than the 'erl' script in the cygwin_tools directory.
 
+You must also set a CFLAGS environment variable to '-O2' - ie:
+
+  # export CFLAGS=-O2
+
 And we should be ready to bootstrap:
 
   $ cd $COUCHDB_TOP
@@ -357,9 +361,13 @@ For reference, the following command-line is an example of a real command-line:
 
 ./configure --with-js-include=/cygdrive/o/src/mozilla-central/work/js/src/build-release/dist/include \
             --with-js-lib=/cygdrive/o/src/mozilla-central/work/js/src/build-release/dist/lib \
-            --with-win32-icu-binaries=o:/src/mm/icu \
+            --with-win32-icu-binaries=/cygdrive/o/src/mm/icu \
             --with-erlang=o:/temp/erl5.6.5/erts-5.6.5/include \
-            --with-win32-curl=o:/src/mm/curl-7.19.5
+            --with-win32-curl=o:/src/mm/curl-7.19.5 \
+            --prefix=/cygdrive/c/src/mm/couch/otp_src_R13B01/release/win32/
+
+Note: --prefix above - only used by 'make install' and assumes a source
+erlang distro.  couch will be installed directly into the specified erlanf
 
 Status:
 
@@ -367,6 +375,3 @@ Status:
   Problems seem to be:
 
   - making libtool do the right thing wrt command-lines.
-
-  - ICU lib names seem to be a 'short' version on win32 - eg,
-    licuin.lib instead of licui18n.lib, etc.
