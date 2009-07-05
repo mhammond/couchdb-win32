@@ -276,8 +276,15 @@ AC_SUBST([localstatelibdir], [${localstatedir}/lib/${package_identifier}])
 AC_SUBST([localstatelogdir], [${localstatedir}/log/${package_identifier}])
 AC_SUBST([localstaterundir], [${localstatedir}/run/${package_identifier}])
 AC_SUBST([locallibbindir], [${locallibdir}/bin])
-AC_SUBST([localerlangbindir], [${locallibdir}/erlang/bin])
-AC_SUBST([localerlanglibdir], [${locallibdir}/erlang/lib])
+
+# On Windows we install directly into our erlang distribution.
+if test x${IS_WINDOWS} = xSADLY; then
+    AC_SUBST([localerlangbindir], [${libdir}])
+    AC_SUBST([localerlanglibdir], [${libdir}])
+else
+    AC_SUBST([localerlangbindir], [${locallibdir}/erlang/bin])
+    AC_SUBST([localerlanglibdir], [${locallibdir}/erlang/lib])
+fi
 
 # fix for older autotools that don't define "abs_top_YYY" by default
 AC_SUBST(abs_top_srcdir)
@@ -288,6 +295,7 @@ AC_REVISION([LOCAL_VERSION])
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([bin/couchjs.tpl])
 AC_CONFIG_FILES([bin/couchdb.tpl])
+AC_CONFIG_FILES([bin/couchdb.bat.tpl])
 AC_CONFIG_FILES([bin/Makefile])
 AC_CONFIG_FILES([etc/couchdb/Makefile])
 AC_CONFIG_FILES([etc/couchdb/default.ini.tpl])
