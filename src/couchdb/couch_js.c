@@ -20,9 +20,6 @@ specific language governing permissions and limitations under the License.
 #include <jsapi.h>
 #include <curl/curl.h>
 
-extern JS_FRIEND_API(int)
-js_fgets(char *buf, int size, FILE *file);
-
 #ifndef CURLOPT_COPYPOSTFIELDS
    #define CURLOPT_COPYPOSTFIELDS 10165
 #endif
@@ -1215,10 +1212,8 @@ main(int argc, const char * argv[]) {
     if (!context)
         return 1;
     JS_SetErrorReporter(context, PrintError);
-#ifdef JSOPTION_NATIVE_BRANCH_CALLBACK
     JS_SetBranchCallback(context, BranchCallback);
     JS_ToggleOptions(context, JSOPTION_NATIVE_BRANCH_CALLBACK);
-#endif
     JS_ToggleOptions(context, JSOPTION_XML);
 
     global = JS_NewObject(context, NULL, NULL, NULL);
