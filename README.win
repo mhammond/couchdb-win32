@@ -36,7 +36,9 @@ Other tools:
 
 * Download the ICU binaries built with VS2008.
 
-* Download and build the hg trunk/branch of seamonkey.
+* Download and build the same version of spidermonkey the version of couch
+  requires - at time of writing this is 1.8.  Different versions will not
+  work (ie, at time of writing, 1.8.1 does not work with couch).
 
 Build Environment
 -----------------
@@ -64,7 +66,7 @@ Set the following variables:
 
 Add a couple of directories to the PATH:
 
-  $ export PATH=$PATH:$ERL_TOP/erts-5.6.5/bin:$WIN_SDK_TOP/bin
+  $ export PATH=$ERL_TOP/erts-5.6.5/bin:$PATH:$WIN_SDK_TOP/bin
 
 If you are building with a binary distro of Erlang:
 
@@ -81,11 +83,8 @@ If you are building Erlang from sources, then executing
 "eval `./otp_build env_win32`" as per the Erlang build instructions,
 will have set everything up, including the CC, LD etc variables.
 EXCEPT - PATH must be adjusted such what 'which erl' lists the erl.exe
-you built rather than the 'erl' script in the cygwin_tools directory.
-
-You must also set a CFLAGS environment variable to '-O2' - ie:
-
-  # export CFLAGS=-O2
+you built rather than the 'erl' script in the cygwin_tools directory as shown
+in the PATH example above.
 
 And we should be ready to bootstrap and build
 
@@ -109,12 +108,12 @@ Now we need to run a complicated configure command-line.
       --with-win32-icu-binaries=path/to/icu-binaries/include \
       --with-erlang=path/to/erlang/erts-5.6.5/include \
       --with-win32-curl=path/to/curl/root/directory
-      --prefix=/cygdrive/path/to/erlang/releasec
+      --prefix=/cygdrive/path/to/erlang/release/win32
 
 Where:
-* 'path_to_seamonkey_include' will be the 'build-xxx/dist/include' dir under 
-   seamonkey in cygwin format (ie, /cygpath/...)
-* 'path_to_seamonkey_lib' is the 'build-xxx/dist/lib in cygwin format.
+* 'path_to_seamonkey_include' and 'path_to_seamonkey_lib' are in cygwin 
+  format, and their location will depend on the version of spidermonkey
+  you are building.
 * 'path/to/icu-binaries' should be in cygwin format.
 * The other paths should be somewhat obvious, but are in Windows format
   with forward slashes (eg, c:/...).
