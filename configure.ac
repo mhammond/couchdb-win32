@@ -86,7 +86,11 @@ case "$(uname -s)" in
     FLAGS="$LIB_FLAGS $ERLANG_FLAGS $JS_FLAGS -DXP_WIN $FLAGS"
     CPPFLAGS="$FLAGS $CPPFLAGS"
     LDFLAGS="$FLAGS $LDFLAGS"
-    IS_WINDOWS="SADLY"
+    IS_WINDOWS="TRUE"
+    # The erlang cc.sh/ld.sh scripts will convert a -O option
+    # into the same optimization flags erlang itself uses.
+    CFLAGS="-O2"
+    LTCFLAGS="$CFLAGS"
     ;;
   *)
     # XP_UNIX required for jsapi.h and has been tested to work on Linux and Darwin.
@@ -97,14 +101,15 @@ case "$(uname -s)" in
     ;;
 esac
 
-AM_CONDITIONAL([WINDOWS], [test x$IS_WINDOWS = xSADLY])
+AM_CONDITIONAL([WINDOWS], [test x$IS_WINDOWS = xTRUE])
 
 AC_CHECK_LIB([js], [JS_NewContext], [], [
     AC_CHECK_LIB([mozjs], [JS_NewContext], [], [
         AC_CHECK_LIB([js3250], [JS_NewContext], [], [
-            AC_MSG_ERROR([Could not find the js library.
+            AC_CHECK_LIB([js32], [JS_NewContext], [], [
+                AC_MSG_ERROR([Could not find the js library.
 
-Is the Mozilla SpiderMonkey library installed?])])])])
+Is the Mozilla SpiderMonkey library installed?])])])])])
 
 AC_CHECK_HEADER([jsapi.h], [], [
     AC_MSG_ERROR([Could not find the jsapi header.
@@ -280,7 +285,7 @@ AC_SUBST([localstatelogdir], [${localstatedir}/log/${package_identifier}])
 AC_SUBST([localstaterundir], [${localstatedir}/run/${package_identifier}])
 
 # On Windows we install directly into our erlang distribution.
-if test x${IS_WINDOWS} = xSADLY; then
+if test x${IS_WINDOWS} = xTRUE; then
     AC_SUBST([locallibbindir], [${prefix}/bin])
     AC_SUBST([localerlangbindir], [${libdir}])
     AC_SUBST([localerlanglibdir], [${libdir}])
@@ -326,9 +331,9 @@ AC_OUTPUT
 # expects GNU style lib names).  I can't work out how to configure this
 # option sanely, so we pass the script through sed to modify it.
 # Also, the erlang cc.sh script doesn't cope well with the '-link' command
-# line libtool provides.
+# line option libtool provides.
 # PLEASE, someone help put this out of its misery!!
-if test x${IS_WINDOWS} = xSADLY; then
+if test x${IS_WINDOWS} = xTRUE; then
     sed -e 's,libname_spec="lib\\$name",libname_spec="\\\$name",' \
         -e 's,-link,,' \
         < libtool > libtool.tmp

@@ -187,13 +187,22 @@ couch.app: couch.app.tpl
 	$(ERLC) $(ERLC_FLAGS) ${TEST} $<;
 
 install-data-hook:
-	if test -f "$(DESTDIR)/$(couchprivlibdir)/couch_erl_driver"; then \
-	    rm -f "$(DESTDIR)/$(couchprivlibdir)/couch_erl_driver.so"; \
-	    cd "$(DESTDIR)/$(couchprivlibdir)" && \
+	if test -f "$(DESTDIR)$(couchprivlibdir)/couch_erl_driver"; then \
+	    rm -f "$(DESTDIR)$(couchprivlibdir)/couch_erl_driver.so"; \
+	    cd "$(DESTDIR)$(couchprivlibdir)" && \
 	        $(LN_S) couch_erl_driver couch_erl_driver.so; \
 	fi
+if WINDOWS
+# libtool and automake have defeated markh.  For each of our executables
+# we end up with 2 copies - one directly in the 'target' folder (eg, 'priv')
+# and another - the correct one - in .libs.  The former doesn't work but is 
+# what gets installed for 'couchspawnkillable' - but the correct one for
+# couchjs.exe *does* get copied.  *shrug*  So just clobber it with the 
+# correct one here...
+	$(INSTALL) priv/.libs/couchspawnkillable.exe "$(DESTDIR)$(couchprivdir)/."
+endif
 
 uninstall-local:
-	if test -f "$(DESTDIR)/$(couchprivlibdir)/couch_erl_driver"; then \
-	    rm -f "$(DESTDIR)/$(couchprivlibdir)/couch_erl_driver.so"; \
+	if test -f "$(DESTDIR)$(couchprivlibdir)/couch_erl_driver"; then \
+	    rm -f "$(DESTDIR)$(couchprivlibdir)/couch_erl_driver.so"; \
 	fi
